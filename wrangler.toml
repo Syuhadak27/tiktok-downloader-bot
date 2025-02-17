@@ -1,0 +1,8 @@
+name = "tiktok-telegram-bot"
+account_id = "3d07b0c378375dcdc1110ebae9ed92d2"
+workers_dev = true
+main = "src/index.js"
+compatibility_date = "2025-02-17"  # Sesuai dengan tanggal hari ini
+
+# Tambahan optional untuk debugging
+logpush = true  # Mengaktifkan log untuk debugging
