@@ -1,6 +1,8 @@
-// index.js
+
+
 import { BOT_TOKEN, CHANNEL_ID } from './config.js';
 import { sendMessage, sendVideo, sendPhoto, sendMediaGroup, deleteMessage, sendLogToChannel } from './utils.js';
+import { sendMessageWithButtons, getStartButtons } from './tombol.js';
 
 addEventListener('fetch', (event) => {
     event.respondWith(handleRequest(event));
@@ -43,7 +45,9 @@ async function handleRequest(event) {
     }
 
     if (text === '/start') {
-        await sendMessage(chatId, 'Bot aktif! Kirim link TikTok untuk mendownload video, gambar, atau album.');
+        // Gunakan fungsi untuk mengirim pesan dengan tombol
+        const welcomeMessage = 'Selamat datang di Bot TikTok Downloader! 🤖\n\nKirim link TikTok untuk mendownload video, gambar, atau album.\n\nBerikut bot yg semuanya 🟢Online bisa di gunakan😁🥱';
+        await sendMessageWithButtons(chatId, welcomeMessage, getStartButtons());
         return new Response('OK', { status: 200 });
     }
 
