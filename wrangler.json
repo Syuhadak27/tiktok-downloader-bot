@@ -1,8 +1,0 @@
-{
-  "name": "tiktok-telegram-bot",
-  "main": "src/index.js",
-  "compatibility_date": "2025-02-14",
-  "observability": {
-    "enabled": true
-  }
-}
