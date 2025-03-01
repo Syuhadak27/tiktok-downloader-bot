@@ -1,5 +1,3 @@
-
-
 import { BOT_TOKEN, CHANNEL_ID } from './config.js';
 import { sendMessage, sendVideo, sendPhoto, sendMediaGroup, deleteMessage, sendLogToChannel } from './utils.js';
 import { sendMessageWithButtons, getStartButtons } from './tombol.js';
@@ -45,41 +43,50 @@ async function handleRequest(event) {
     }
 
     if (text === '/start') {
-        // Gunakan fungsi untuk mengirim pesan dengan tombol
-        const welcomeMessage = 'Selamat datang di Bot TikTok Downloader! 🤖\n\nKirim link TikTok untuk mendownload video, gambar, atau album.\n\nBerikut bot yg semuanya 🟢Online bisa di gunakan😁🥱';
+        const welcomeMessage = 'Selamat datang di Bot TikTok Downloader! 🤖\n\nKirim link TikTok untuk mendownload video, gambar, album dan bulk support\n\nBerikut bot yg semuanya 🟢Online bisa di gunakan😁🥱\n';
         await sendMessageWithButtons(chatId, welcomeMessage, getStartButtons());
         return new Response('OK', { status: 200 });
     }
 
-    if (!text.includes('tiktok.com')) {
-        console.log('Pesan bukan link TikTok, diabaikan.');
+    // Cek apakah ada link TikTok dalam pesan
+    const links = text.split('\n')
+        .map(link => link.trim())
+        .filter(link => link.includes('tiktok.com'));
+
+    if (links.length === 0) {
+        console.log('Tidak ada link TikTok yang valid.');
         return new Response('Ignored', { status: 200 });
     }
 
-    try {
-        const processingMessageId = await sendMessage(chatId, 'Sedang memproses...');
+    const isBulk = links.length > 1;
+    const processingMessageId = isBulk ? await sendMessage(chatId, '🔄 Memproses beberapa link...') : null;
 
-        const media = await getTikTokMedia(text);
+    for (const link of links) {
+        try {
+            const media = await getTikTokMedia(link);
 
-        if (media.type === 'video') {
-            await sendVideo(chatId, media.videoUrl, text, displayName);
-        } else if (media.type === 'image') {
-            await sendPhoto(chatId, media.imageUrl, text, displayName);
-        } else if (media.type === 'album') {
-            await sendMediaGroup(chatId, media.images, text, displayName);
-        } else {
-            throw new Error('Format tidak didukung.');
+            if (media.type === 'video') {
+                await sendVideo(chatId, media.videoUrl, link, displayName);
+            } else if (media.type === 'image') {
+                await sendPhoto(chatId, media.imageUrl, link, displayName);
+            } else if (media.type === 'album') {
+                await sendMediaGroup(chatId, media.images, link, displayName);
+            } else {
+                throw new Error('Format tidak didukung.');
+            }
+        } catch (error) {
+            console.error(`❌ Gagal memproses: ${link}`, error);
+            await sendMessage(chatId, `⚠️ Gagal memproses link:\n${link}`);
         }
 
-        await deleteMessage(chatId, messageId);
-        if (processingMessageId) await deleteMessage(chatId, processingMessageId);
-
-        return new Response('OK', { status: 200 });
-    } catch (error) {
-        console.error(error);
-        await sendMessage(chatId, 'Terjadi kesalahan saat memproses link TikTok.');
-        return new Response('Error', { status: 500 });
+        // Delay opsional untuk menghindari rate limit (2 detik)
+        if (isBulk) await new Promise(resolve => setTimeout(resolve, 2000));
     }
+
+    if (processingMessageId) await deleteMessage(chatId, processingMessageId);
+    await deleteMessage(chatId, messageId);
+
+    return new Response('OK', { status: 200 });
 }
 
 // Fungsi untuk mengambil media dari TikTok
