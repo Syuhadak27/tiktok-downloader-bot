@@ -1,73 +1,56 @@
 
+---
+
+# 🤖 Tiktok Telegram Bot (Cloudflare Workers)
+
+Bot ini berfungsi untuk **download video, gambar, album TikTok** melalui Telegram, dan berjalan di **Cloudflare Workers** menggunakan `wrangler`.
 
 ---
 
-# 🚀 Deploy ke Cloudflare dengan Wrangler CLI (Termux & Ubuntu)
+## 🚀 Deploy ke Cloudflare
 
-Tutorial ini menjelaskan cara **membuat project baru** dan **deploy ke Cloudflare** menggunakan `wrangler` CLI.  
-Contoh project: **Tiktok-telegram-bot**
-
----
-
-## 📌 Persiapan
-
-### 1. Install Node.js & npm
-#### Termux
-```bash
-pkg update && pkg upgrade
-pkg install nodejs git
-```
-
-
-Ubuntu
-```bash
-sudo apt update && sudo apt upgrade
-sudo apt install nodejs npm git -y
-```
-
-2. Install Wrangler CLI
-```bash
-npm install -g wrangler
-```
-
-3. Login ke Cloudflare
-
-```bash
-wrangler login
-```
-
-👉 Perintah ini akan membuka browser untuk autentikasi ke akun Cloudflare.
-
-
----
-
-🛠 Membuat Project Baru
-
-1. Buat folder project dengan wrangler init:
+### 1. Buat project
 ```bash
 wrangler init Tiktok-telegram-bot
 ```
-
-
-2. Masuk ke folder project:
-```basg
+```bash
 cd Tiktok-telegram-bot
 ```
+2. Install Wrangler
+```bash
+npm install -g wrangler
+wrangler login
+```
 
----
-
-🌐 Deploy ke Cloudflare
-
-1. Deploy dengan perintah:
+3. Deploy ke Cloudflare
 ```bash
 wrangler deploy
 ```
 
-2. Jika sukses, output akan menampilkan URL seperti:
+Jika berhasil, akan keluar URL Worker seperti:
 
 https://tiktok-telegram-bot.<your-subdomain>.workers.dev
 
 
-
+---
 
 ---
+
+🔗 Set Webhook Telegram
+
+🔹 Opsi 1: Via Endpoint /SetWebhook
+
+Setelah deploy, cukup buka di browser:
+
+https://tiktok-telegram-bot.<your-subdomain>.workers.dev/SetWebhook
+
+Jika sukses, browser akan menampilkan JSON:
+
+{
+  "message": "SetWebhook called",
+  "result": {
+    "ok": true,
+    "result": true,
+    "description": "Webhook was set"
+  }
+}
