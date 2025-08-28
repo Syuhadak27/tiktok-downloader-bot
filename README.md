@@ -16,13 +16,13 @@ wrangler init Tiktok-telegram-bot
 ```bash
 cd Tiktok-telegram-bot
 ```
-2. Install Wrangler
+2. Masukkan file semua nya ke folder src
+3. Install Wrangler
 ```bash
-npm install -g wrangler
 wrangler login
 ```
 
-3. Deploy ke Cloudflare
+4. Deploy ke Cloudflare
 ```bash
 wrangler deploy
 ```
