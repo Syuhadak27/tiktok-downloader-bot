@@ -184,13 +184,26 @@ export async function sendMediaGroup(chatId, media, sourceLink, displayName) {
             }
 
             // Kirim ke channel dengan tombol
+
+            const ownerIds = [1980888203, 7050828191]; // Ganti dengan ID owner yang benar
             const channelBatch = [...batch];
+
             if (channelBatch.length > 0) {
-                channelBatch[0] = {
-                    ...channelBatch[0],
-                    caption: `📸 Album dikirim dari ${displayName}\n\n--------<a href="${sourceLink}">🔗 Source Link</a>----------`,
-                    parse_mode: 'HTML'
-                };
+                if (!ownerIds.includes(chatId)) { // Jika user BUKAN owner, tambahkan caption
+                    channelBatch[0] = {
+                        ...channelBatch[0],
+                        caption: `📸 Album dikirim dari ${displayName}\n\n--------<a href="${sourceLink}">🔗 Source Link</a>----------`,
+                        parse_mode: 'HTML'
+                    };
+                } else {
+                    // Jika user adalah owner, hapus caption
+                    channelBatch[0] = {
+                        ...channelBatch[0],
+                        caption: `📸 Album dikirim dari \n-------<a href="${sourceLink}">🔗 Source Link</a>----------`,
+                        parse_mode: 'HTML'
+                    };
+                    //delete channelBatch[0].caption;
+                }
             }
 
             await fetch(url, {

@@ -8,7 +8,23 @@ addEventListener('fetch', (event) => {
 
 async function handleRequest(event) {
     const request = event.request;
+    const url = new URL(request.url);
 
+    // 👉 Tambahan: endpoint untuk setWebhook via GET
+    if (url.pathname === "/SetWebhook") {
+        const webhookUrl = `${url.origin}`; // otomatis pakai domain worker
+        const tgUrl = `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${webhookUrl}`;
+        
+        const res = await fetch(tgUrl);
+        const data = await res.json();
+
+        return new Response(
+            JSON.stringify({ message: "SetWebhook called", result: data }, null, 2),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+        );
+    }
+
+    // Endpoint utama hanya menerima POST dari Telegram
     if (request.method !== 'POST') {
         return new Response('Method not allowed', { status: 405 });
     }
@@ -48,7 +64,7 @@ async function handleRequest(event) {
         return new Response('OK', { status: 200 });
     }
 
-    // Cek apakah ada link TikTok dalam pesan
+    // Cek link TikTok
     const links = text.split('\n')
         .map(link => link.trim())
         .filter(link => link.includes('tiktok.com'));
@@ -79,7 +95,6 @@ async function handleRequest(event) {
             await sendMessage(chatId, `⚠️ Gagal memproses link:\n${link}`);
         }
 
-        // Delay opsional untuk menghindari rate limit (2 detik)
         if (isBulk) await new Promise(resolve => setTimeout(resolve, 2000));
     }
 
@@ -89,7 +104,7 @@ async function handleRequest(event) {
     return new Response('OK', { status: 200 });
 }
 
-// Fungsi untuk mengambil media dari TikTok
+// Fungsi untuk ambil media dari TikTok
 async function getTikTokMedia(url) {
     const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
     const response = await fetch(apiUrl);
